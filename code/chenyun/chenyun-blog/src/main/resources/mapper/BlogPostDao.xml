@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.programmercy.infra.mapper.BlogPostDao">
+
+    <resultMap type="com.programmercy.infra.po.BlogPost" id="BlogPostMap">
+        <result property="blogPostId" column="blog_post_id" jdbcType="INTEGER"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="authorId" column="author_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="views" column="views" jdbcType="INTEGER"/>
+        <result property="likes" column="likes" jdbcType="INTEGER"/>
+        <result property="bookmarksCount" column="bookmarks_count" jdbcType="INTEGER"/>
+        <result property="createdAt" column="created_at" jdbcType="VARCHAR"/>
+        <result property="updatedAt" column="updated_at" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BlogPostMap">
+        select blog_post_id,
+               title,
+               content,
+               author_id,
+               status,
+               views,
+               likes,
+               bookmarks_count,
+               created_at,
+               updated_at
+        from blog_post
+        where blog_post_id = #{blogPostId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="BlogPostMap">
+        select
+        blog_post_id, title, content, author_id, status, views, likes, bookmarks_count, created_at, updated_at
+        from blog_post
+        <where>
+            <if test="blogPost.blogPostId != null">
+                and blog_post_id = #{blogPost.blogPostId}
+            </if>
+            <if test="blogPost.title != null and blogPost.title != ''">
+                and title = #{blogPost.title}
+            </if>
+            <if test="blogPost.content != null and blogPost.content != ''">
+                and content = #{blogPost.content}
+            </if>
+            <if test="blogPost.authorId != null">
+                and author_id = #{blogPost.authorId}
+            </if>
+            <if test="blogPost.status != null">
+                and status = #{blogPost.status}
+            </if>
+            <if test="blogPost.views != null">
+                and views = #{blogPost.views}
+            </if>
+            <if test="blogPost.likes != null">
+                and likes = #{blogPost.likes}
+            </if>
+            <if test="blogPost.bookmarksCount != null">
+                and bookmarks_count = #{blogPost.bookmarksCount}
+            </if>
+            <if test="blogPost.createdAt != null and blogPost.createdAt != ''">
+                and created_at = #{blogPost.createdAt}
+            </if>
+            <if test="blogPost.updatedAt != null and blogPost.updatedAt != ''">
+                and updated_at = #{blogPost.updatedAt}
+            </if>
+        </where>
+        limit #{target}, #{pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from blog_post
+        <where>
+            <if test="blogPostId != null">
+                and blog_post_id = #{blogPostId}
+            </if>
+            <if test="title != null and title != ''">
+                and title = #{title}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="authorId != null">
+                and author_id = #{authorId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="views != null">
+                and views = #{views}
+            </if>
+            <if test="likes != null">
+                and likes = #{likes}
+            </if>
+            <if test="bookmarksCount != null">
+                and bookmarks_count = #{bookmarksCount}
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                and created_at = #{createdAt}
+            </if>
+            <if test="updatedAt != null and updatedAt != ''">
+                and updated_at = #{updatedAt}
+            </if>
+        </where>
+    </select>
+
+    <!--  分页搜索文章  -->
+    <select id="pagingQueryArticleListByLimit" resultType="com.programmercy.infra.po.BlogPost">
+        select
+        blog_post_id, title, content, author_id, status, views, likes, bookmarks_count, created_at, updated_at
+        from blog_post
+        <where>
+            <if test="blogPost.title != null and blogPost.title != ''">
+                and title like concat("%", #{blogPost.title}, "%")
+            </if>
+            <if test="blogPost.status != null">
+                and status = #{blogPost.status}
+            </if>
+        </where>
+        limit #{target}, #{pageSize}
+    </select>
+
+    <!--  搜索到的文章总数  -->
+    <select id="searchBlogPostCount" resultType="java.lang.Long">
+        select
+        count(1)
+        from blog_post
+        <where>
+            <if test="blogPost.title != null and blogPost.title != ''">
+                and title like concat("%", #{blogPost.title}, "%")
+            </if>
+            <if test="blogPost.status != null">
+                and status = #{blogPost.status}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="blogPostId" useGeneratedKeys="true">
+        insert into blog_post(title, content, author_id, status, views, likes, bookmarks_count, created_at, updated_at)
+        values (#{title}, #{content}, #{authorId}, #{status}, #{views}, #{likes}, #{bookmarksCount}, #{createdAt},
+                #{updatedAt})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="blogPostId" useGeneratedKeys="true">
+        insert into blog_post(title, content, author_id, status, views, likes, bookmarks_count, created_at, updated_at)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.title}, #{entity.content}, #{entity.authorId}, #{entity.status}, #{entity.views}, #{entity.likes},
+            #{entity.bookmarksCount}, #{entity.createdAt}, #{entity.updatedAt})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="blogPostId" useGeneratedKeys="true">
+        insert into blog_post(title, content, author_id, status, views, likes, bookmarks_count, created_at, updated_at)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.title}, #{entity.content}, #{entity.authorId}, #{entity.status}, #{entity.views}, #{entity.likes},
+            #{entity.bookmarksCount}, #{entity.createdAt}, #{entity.updatedAt})
+        </foreach>
+        on duplicate key update
+        title = values(title),
+        content = values(content),
+        author_id = values(author_id),
+        status = values(status),
+        views = values(views),
+        likes = values(likes),
+        bookmarks_count = values(bookmarks_count),
+        created_at = values(created_at),
+        updated_at = values(updated_at)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update blog_post
+        <set>
+            <if test="title != null and title != ''">
+                title = #{title},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="authorId != null">
+                author_id = #{authorId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="views != null">
+                views = #{views},
+            </if>
+            <if test="likes != null">
+                likes = #{likes},
+            </if>
+            <if test="bookmarksCount != null">
+                bookmarks_count = #{bookmarksCount},
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                created_at = #{createdAt},
+            </if>
+            <if test="updatedAt != null and updatedAt != ''">
+                updated_at = #{updatedAt},
+            </if>
+        </set>
+        where blog_post_id = #{blogPostId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from blog_post
+        where blog_post_id = #{blogPostId}
+    </delete>
+
+</mapper>
+

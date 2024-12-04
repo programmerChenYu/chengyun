@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.programmercy.infra.mapper.BlogPostTagDao">
+
+    <resultMap type="com.programmercy.infra.po.BlogPostTag" id="BlogPostTagMap">
+        <result property="blogPostId" column="blog_post_id" jdbcType="INTEGER"/>
+        <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BlogPostTagMap">
+        select blog_post_id,
+               tag_id
+        from blog_post_tag
+        where blog_post_id = #{blogPostId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="BlogPostTagMap">
+        select
+        blog_post_id, tag_id
+        from blog_post_tag
+        <where>
+            <if test="blogPostId != null">
+                and blog_post_id = #{blogPostId}
+            </if>
+            <if test="tagId != null">
+                and tag_id = #{tagId}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from blog_post_tag
+        <where>
+            <if test="blogPostId != null">
+                and blog_post_id = #{blogPostId}
+            </if>
+            <if test="tagId != null">
+                and tag_id = #{tagId}
+            </if>
+        </where>
+    </select>
+
+    <!--  获取所有标签在博文中出现的次数  -->
+    <select id="queryAllCount" resultType="java.lang.Long">
+        select count(1)
+        from blog_post_tag
+    </select>
+
+    <!--  根据标签id，去博客标签关联表中进行计数，看被多少博文引用  -->
+    <select id="countByTagId" resultType="java.lang.Long">
+        select count(1) from blog_post_tag where tag_id = #{tagId}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="blogPostId" useGeneratedKeys="true">
+        insert into blog_post_tag()
+        values ()
+    </insert>
+
+    <insert id="insertBatch" keyProperty="blogPostId" useGeneratedKeys="true">
+        insert into blog_post_tag()
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            ()
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="blogPostId" useGeneratedKeys="true">
+        insert into blog_post_tag()
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            ()
+        </foreach>
+        on duplicate key update
+
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update blog_post_tag
+        <set>
+        </set>
+        where blog_post_id = #{blogPostId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from blog_post_tag
+        where blog_post_id = #{blogPostId}
+    </delete>
+
+</mapper>
+

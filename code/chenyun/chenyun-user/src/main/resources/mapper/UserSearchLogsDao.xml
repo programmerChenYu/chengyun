@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.programmercy.infra.mapper.UserSearchLogsDao">
+
+    <resultMap type="com.programmercy.infra.po.UserSearchLogs" id="UserSearchLogsMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="searchQuery" column="search_query" jdbcType="VARCHAR"/>
+        <result property="searchTime" column="search_time" jdbcType="VARCHAR"/>
+        <result property="searchResultCount" column="search_result_count" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserSearchLogsMap">
+        select id,
+               user_id,
+               search_query,
+               search_time,
+               search_result_count
+        from user_search_logs
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserSearchLogsMap">
+        select
+        id, user_id, search_query, search_time, search_result_count
+        from user_search_logs
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="searchQuery != null and searchQuery != ''">
+                and search_query = #{searchQuery}
+            </if>
+            <if test="searchTime != null and searchTime != ''">
+                and search_time = #{searchTime}
+            </if>
+            <if test="searchResultCount != null">
+                and search_result_count = #{searchResultCount}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user_search_logs
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="searchQuery != null and searchQuery != ''">
+                and search_query = #{searchQuery}
+            </if>
+            <if test="searchTime != null and searchTime != ''">
+                and search_time = #{searchTime}
+            </if>
+            <if test="searchResultCount != null">
+                and search_result_count = #{searchResultCount}
+            </if>
+        </where>
+    </select>
+
+    <!--  获取热门搜索  -->
+    <select id="getHotSearch" resultType="com.programmercy.dto.HotSearchDTO">
+        select search_query as name, count(search_query) as value
+        from user_search_logs
+        group by search_query
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into user_search_logs(user_id, search_query, search_time, search_result_count)
+        values (#{userId}, #{searchQuery}, #{searchTime}, #{searchResultCount})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user_search_logs(user_id, search_query, search_time, search_result_count)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.searchQuery}, #{entity.searchTime}, #{entity.searchResultCount})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user_search_logs(user_id, search_query, search_time, search_result_count)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.searchQuery}, #{entity.searchTime}, #{entity.searchResultCount})
+        </foreach>
+        on duplicate key update
+        user_id = values(user_id),
+        search_query = values(search_query),
+        search_time = values(search_time),
+        search_result_count = values(search_result_count)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user_search_logs
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="searchQuery != null and searchQuery != ''">
+                search_query = #{searchQuery},
+            </if>
+            <if test="searchTime != null and searchTime != ''">
+                search_time = #{searchTime},
+            </if>
+            <if test="searchResultCount != null">
+                search_result_count = #{searchResultCount},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from user_search_logs
+        where id = #{id}
+    </delete>
+
+</mapper>
+

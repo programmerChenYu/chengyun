@@ -1,0 +1,87 @@
+.chenyun-home {
+    overflow: auto;
+    background-color: rgba(169, 169, 169, 0.1);
+    /*width: 88.3vw;*/
+    height: 93vh;
+}
+
+.chenyun-home-title {
+    border-bottom: 1px solid rgba(169, 169, 169, 0.7);
+    padding-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: default;
+}
+
+.chenyun-home-backlog {
+    margin: 24px 16px;
+    padding: 15px 15px;
+    height: 150px;
+    background: #ffffff;
+    overflow: auto;
+}
+.chenyun-home-backlog-content {
+    padding-top: 10px;
+}
+.chenyun-home-backlog-content-svg {
+}
+.chenyun-home-backlog-content-num {
+    padding-top: 25px;
+    transition: color 0.2s ease;
+}
+.chenyun-home-backlog-content-num:hover {
+    color: orange;
+    cursor: pointer;
+}
+
+/*用户所在地区分布*/
+.chenyun-home-region {
+    margin: 0px 16px;
+    padding: 24px 24px 0px 24px;
+    height: 387px;
+    background: #ffffff;
+    overflow: auto;
+}
+.chenyun-home-region-content {
+    height: 325px;
+}
+
+/*热门分类*/
+.chenyun-home-hot-category {
+    margin: 24px 16px 12px;
+    padding: 24px 24px 0px 24px;
+    background: #ffffff;
+    width: 40%;
+    height: 230px;
+    overflow: auto;
+}
+.chenyun-home-hot-category-content {
+    height: 160px;
+}
+
+/*热门搜索*/
+.chenyun-home-hot-search {
+    margin: 24px 16px 12px;
+    padding: 24px 24px 0px 24px;
+    background: #ffffff;
+    width: 30%;
+    height: 230px;
+    overflow: auto;
+}
+.chenyun-home-hot-search-content {
+    height: 160px;
+}
+
+/*本周用户访问量*/
+.chenyun-home-user-access {
+    margin: 24px 16px 12px;
+    padding: 24px 24px 0px 24px;
+    background: #ffffff;
+    width: 30%;
+    height: 230px;
+    overflow: auto;
+}
+.chenyun-home-user-access-chart {
+    /*border: 1px solid;*/
+    height: 160px;
+}

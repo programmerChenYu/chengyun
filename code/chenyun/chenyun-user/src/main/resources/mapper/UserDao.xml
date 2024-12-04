@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.programmercy.infra.mapper.UserDao">
+
+    <resultMap type="com.programmercy.infra.po.User" id="UserMap">
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="role" column="role" jdbcType="INTEGER"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="VARCHAR"/>
+        <result property="locationId" column="location_id" jdbcType="INTEGER"/>
+        <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+        <result property="userStatus" column="user_status" jdbcType="INTEGER"/>
+        <result property="information" column="information" jdbcType="VARCHAR"/>
+        <result property="infoStatus" column="info_status" jdbcType="INTEGER"/>
+        <result property="reviewInfo" column="review_info" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMap">
+        select user_id,
+               username,
+               password,
+               role,
+               avatar,
+               email,
+               created_at,
+               location_id,
+               nickname,
+               user_status,
+               information,
+               info_status,
+               review_info
+        from user
+        where user_id = #{userId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserMap">
+        select
+        user_id, username, password, role, avatar, email, created_at, location_id, nickname, user_status, information,
+        info_status, review_info
+        from user
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="role != null">
+                and role = #{role}
+            </if>
+            <if test="avatar != null and avatar != ''">
+                and avatar = #{avatar}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                and created_at = #{createdAt}
+            </if>
+            <if test="locationId != null">
+                and location_id = #{locationId}
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname = #{nickname}
+            </if>
+            <if test="userStatus != null">
+                and user_status = #{userStatus}
+            </if>
+            <if test="information != null and information != ''">
+                and information = #{information}
+            </if>
+            <if test="infoStatus != null">
+                and info_status = #{infoStatus}
+            </if>
+            <if test="reviewInfo != null and reviewInfo != ''">
+                and review_info = #{reviewInfo}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="role != null">
+                and role = #{role}
+            </if>
+            <if test="avatar != null and avatar != ''">
+                and avatar = #{avatar}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                and created_at = #{createdAt}
+            </if>
+            <if test="locationId != null">
+                and location_id = #{locationId}
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname = #{nickname}
+            </if>
+            <if test="userStatus != null">
+                and user_status = #{userStatus}
+            </if>
+            <if test="information != null and information != ''">
+                and information = #{information}
+            </if>
+            <if test="infoStatus != null">
+                and info_status = #{infoStatus}
+            </if>
+            <if test="reviewInfo != null and reviewInfo != ''">
+                and review_info = #{reviewInfo}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryAll" resultMap="UserMap">
+        select user_id,
+               username,
+               password,
+               role,
+               avatar,
+               email,
+               created_at,
+               location_id,
+               nickname,
+               user_status,
+               information,
+               info_status,
+               review_info
+        from user
+    </select>
+
+    <!--  根据分页信息查询用户列表，只要用户不要管理员  -->
+    <select id="queryUsersByPageInfo" resultType="com.programmercy.infra.po.User">
+        select user_id, created_at, info_status, location_id, nickname, user_status, role
+        from user
+        where role = 1 LIMIT #{target}
+            , #{pageSize}
+    </select>
+
+    <!--  根据id，查询用户状态列表  -->
+    <select id="queryUsers" resultType="java.lang.Integer">
+        select user_status from user where user_id in (
+        <foreach collection="userIds" item="userId" separator=",">
+            #{userId}
+        </foreach>
+        )
+    </select>
+
+    <!--  根据分页信息,获取待审核用户列表  -->
+    <select id="queryUsersAuditByPageInfo" resultType="com.programmercy.infra.po.User">
+        select user_id, created_at, location_id, nickname
+        from user
+        where role = 1
+          and info_status = 0 LIMIT #{target}
+            , #{pageSize}
+    </select>
+
+    <!--  根据用户昵称和用户状态来搜索  -->
+    <select id="queryUsersByNicknameAndStatus" resultType="com.programmercy.infra.po.User">
+        SELECT user_id, created_at, info_status, location_id, nickname, user_status
+        from user
+        where role = 1
+          and user_status = #{userStatus}
+          and nickname like concat('%', #{nickname}, '%') limit #{target}
+            , #{pageSize}
+    </select>
+
+    <!--  根据用户状态和用户id精确搜索  -->
+    <select id="queryUserByIdAndStatus" resultType="com.programmercy.infra.po.User">
+        SELECT user_id, created_at, info_status, location_id, nickname, user_status
+        from user
+        where role = 1
+          and user_status = #{userStatus}
+          and user_id = #{userId}
+    </select>
+
+    <!--  根据用户昵称进行模糊搜索  -->
+    <select id="queryUsersByNickname" resultType="com.programmercy.infra.po.User">
+        SELECT user_id, created_at, info_status, location_id, nickname, user_status
+        from user
+        where role = 1
+          and nickname like concat('%', #{nickname}, '%') limit #{target}
+            , #{pageSize}
+    </select>
+
+    <!--  根据用户id进行精确搜索  -->
+    <select id="queryUserById" resultType="com.programmercy.infra.po.User">
+        SELECT user_id, created_at, info_status, location_id, nickname, user_status
+        from user
+        where role = 1
+          and user_id = #{userId}
+    </select>
+
+    <!--  根据用户状态来搜索  -->
+    <select id="queryUsersByStatus" resultType="com.programmercy.infra.po.User">
+        SELECT user_id, created_at, info_status, location_id, nickname, user_status
+        from user
+        where role = 1
+          and user_status = #{userStatus} limit #{target}
+            , #{pageSize}
+    </select>
+
+    <!--  根据用户昵称和用户状态计算符合的用户数  -->
+    <select id="countUsersByNicknameAndStatus" resultType="java.lang.Long">
+        select count(1)
+        from user
+        where role = 1
+          and user_status = #{userStatus}
+          and nickname like concat('%', #{nickname}, '%')
+    </select>
+
+    <!--  根据用户名称和用户状态查看有多少符合的用户  -->
+    <select id="countUsersByNickname" resultType="java.lang.Long">
+        select count(1)
+        from user
+        where role = 1
+          and nickname like concat('%', #{nickname}, '%')
+    </select>
+
+    <!--  根据用户名称和用户状态查看有多少符合的用户  -->
+    <select id="countUsersByStatus" resultType="java.lang.Long">
+        select count(1)
+        from user
+        where role = 1
+          and user_status = #{userStatus}
+    </select>
+
+    <!--  根据用户昵称查询待审核用户列表  -->
+    <select id="queryAuditUsersByNickname" resultType="com.programmercy.infra.po.User">
+        SELECT user_id, created_at, info_status, location_id, nickname, user_status
+        from user
+        where role = 1
+          and info_status = 0
+          and nickname like concat('%', #{nickname}, '%') limit #{target}
+            , #{pageSize}
+    </select>
+
+    <!--  根据用户昵称查询待审核用户列表中用户总数  -->
+    <select id="countAuditUsersByNickname" resultType="java.lang.Long">
+        select count(1)
+        from user
+        where role = 1
+          and info_status = 0
+          and nickname like concat('%', #{nickname}, '%')
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(username, password, role, avatar, email, created_at, location_id, nickname, user_status,
+                         information, info_status, review_info)
+        values (#{username}, #{password}, #{role}, #{avatar}, #{email}, #{createdAt},
+                #{locationId}), #{nickname}, #{userStatus}, #{information}, #{infoStatus}, #{reviewInfo}
+    </insert>
+
+    <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(username, password, role, avatar, email, created_at, location_id, nickname, user_status,
+        information, info_status, review_info)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.username}, #{entity.password}, #{entity.role}, #{entity.avatar}, #{entity.email},
+            #{entity.createdAt}, #{entity.locationId}, #{entity.nickname}, #{entity.userStatus}, #{entity.information},
+            #{entity.infoStatus}, #{entity.reviewInfo})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(username, password, role, avatar, email, created_at, location_id, nickname, user_status,
+        information, info_status, review_info)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.username}, #{entity.password}, #{entity.role}, #{entity.avatar}, #{entity.email},
+            #{entity.createdAt}, #{entity.locationId}, #{entity.nickname}, #{entity.userStatus}, #{entity.information},
+            #{entity.infoStatus}, #{entity.reviewInfo})
+        </foreach>
+        on duplicate key update
+        username = values(username),
+        password = values(password),
+        role = values(role),
+        avatar = values(avatar),
+        email = values(email),
+        created_at = values(created_at),
+        location_id = values(location_id),
+        nickname = values(nickname),
+        user_status = values(user_status),
+        information = values(information),
+        info_status = values(info_status),
+        review_info = values(review_info)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="role != null">
+                role = #{role},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                created_at = #{createdAt},
+            </if>
+            <if test="locationId != null">
+                location_id = #{locationId},
+            </if>
+            <if test="nickname != null and nickname != ''">
+                nickname = #{nickname},
+            </if>
+            <if test="userStatus != null">
+                user_status = #{userStatus},
+            </if>
+            <if test="information != null and information != ''">
+                information = #{information},
+            </if>
+            <if test="infoStatus != null">
+                info_status = #{infoStatus},
+            </if>
+            <if test="reviewInfo != null and reviewInfo != ''">
+                review_info = #{reviewInfo}
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <update id="updateBatch">
+        update user
+        <set>
+            <if test="user.role != null">
+                role = #{user.role},
+            </if>
+            <if test="user.locationId != null">
+                location_id = #{user.locationId},
+            </if>
+            <if test="user.userStatus != null">
+                user_status = #{user.userStatus},
+            </if>
+        </set>
+        where user_id in (
+        <foreach collection="userIds" item="userId" separator=",">
+            #{userId}
+        </foreach>)
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from user
+        where user_id = #{userId}
+    </delete>
+
+</mapper>
+

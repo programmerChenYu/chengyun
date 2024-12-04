@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.programmercy.infra.mapper.UserAccessLogsDao">
+
+    <resultMap type="com.programmercy.infra.po.UserAccessLogs" id="UserAccessLogsMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="accessDate" column="access_date" jdbcType="VARCHAR"/>
+        <result property="visitCount" column="visit_count" jdbcType="INTEGER"/>
+        <result property="createdAt" column="created_at" jdbcType="VARCHAR"/>
+        <result property="updatedAt" column="updated_at" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserAccessLogsMap">
+        select id,
+               user_id,
+               access_date,
+               visit_count,
+               created_at,
+               updated_at
+        from user_access_logs
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserAccessLogsMap">
+        select
+        id, user_id, access_date, visit_count, created_at, updated_at
+        from user_access_logs
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="accessDate != null and accessDate != ''">
+                and access_date = #{accessDate}
+            </if>
+            <if test="visitCount != null">
+                and visit_count = #{visitCount}
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                and created_at = #{createdAt}
+            </if>
+            <if test="updatedAt != null and updatedAt != ''">
+                and updated_at = #{updatedAt}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user_access_logs
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="accessDate != null and accessDate != ''">
+                and access_date = #{accessDate}
+            </if>
+            <if test="visitCount != null">
+                and visit_count = #{visitCount}
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                and created_at = #{createdAt}
+            </if>
+            <if test="updatedAt != null and updatedAt != ''">
+                and updated_at = #{updatedAt}
+            </if>
+        </where>
+    </select>
+
+    <!--  获取一周前的用户访问数据  -->
+    <select id="queryUserVisitsInTheLastWeek" resultType="com.programmercy.dto.UserVisitsDTO">
+        select access_date as day,sum(visit_count) as visits
+        from user_access_logs
+        where access_date between #{oneWeekAgoStr} and #{oneDayAgoStr}
+        group by access_date
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into user_access_logs(user_id, access_date, visit_count, created_at, updated_at)
+        values (#{userId}, #{accessDate}, #{visitCount}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user_access_logs(user_id, access_date, visit_count, created_at, updated_at)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.accessDate}, #{entity.visitCount}, #{entity.createdAt}, #{entity.updatedAt})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user_access_logs(user_id, access_date, visit_count, created_at, updated_at)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.accessDate}, #{entity.visitCount}, #{entity.createdAt}, #{entity.updatedAt})
+        </foreach>
+        on duplicate key update
+        user_id = values(user_id),
+        access_date = values(access_date),
+        visit_count = values(visit_count),
+        created_at = values(created_at),
+        updated_at = values(updated_at)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user_access_logs
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="accessDate != null and accessDate != ''">
+                access_date = #{accessDate},
+            </if>
+            <if test="visitCount != null">
+                visit_count = #{visitCount},
+            </if>
+            <if test="createdAt != null and createdAt != ''">
+                created_at = #{createdAt},
+            </if>
+            <if test="updatedAt != null and updatedAt != ''">
+                updated_at = #{updatedAt},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from user_access_logs
+        where id = #{id}
+    </delete>
+
+</mapper>
+

@@ -1,0 +1,8 @@
+.chenyun-blog-content-list-option-audited {
+    transition: color 0.4s ease;
+    cursor: pointer;
+    font-weight: bold;
+}
+.chenyun-blog-content-list-option-audited:hover {
+    color: orange;
+}

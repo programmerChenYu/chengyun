@@ -1,0 +1,17 @@
+.chenyun-home-region-content-list {
+    /*border: 1px solid;*/
+    padding-top: 10px;
+    height: 325px;
+    width: 300px;
+    overflow: auto;
+}
+
+.chenyun-home-region-content-list-title {
+    font-weight: bold;
+    font-size: 15px;
+    /*color: rgba(255, 165, 0, 0.76);*/
+}
+
+.chenyun-home-region-content-list-title-flush {
+    cursor: pointer;
+}

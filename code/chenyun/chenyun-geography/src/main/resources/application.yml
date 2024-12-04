@@ -1,0 +1,39 @@
+server:
+  port: 8000
+  servlet:
+    # 应用的访问路径
+    context-path: /
+  tomcat:
+    # tomcat 的 URI 编码
+    uri-encoding: UTF-8
+    # 连接数满后的排队数，默认为 100
+    accept-count: 1000
+    threads:
+      # tomcat 最大线程数，默认为 200
+      max: 800
+      # tomcat 启动初始化的线程数，默认值 10
+      min-spare: 100
+spring:
+  application:
+    name: chenyun-geography
+  config:
+    import:
+      - classpath:datasource.yml
+  servlet:
+    multipart:
+      # 单个文件大小
+      max-file-size: 100MB
+      # 设置总上传的文件大小
+      max-request-size: 200MB
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.116.131:8848
+        password: nacos
+        username: nacos
+
+logging:
+  config: classpath:log4j2-spring.xml
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.programmerCy.infra.mapper

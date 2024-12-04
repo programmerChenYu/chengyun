@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/chenyun-blog/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-blog/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-geography/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-geography/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-thirdParty/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-thirdParty/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chenyun-user/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

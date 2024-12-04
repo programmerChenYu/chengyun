@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: user
+          uri: lb://chenyun-user
+          predicates:
+            - Path=/user/**
+        - id: blog
+          uri: lb://chenyun-blog
+          predicates:
+            - Path=/blog/**

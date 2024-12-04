@@ -1,0 +1,94 @@
+
+.chenyun-layout {
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.chenyun-left-sider {
+  min-height: 100%;
+  /*width: 11.7vw;*/
+}
+
+.chenyun-right-layout .chenyun-right-layout-header {
+  background: #fff;
+  padding: 0;
+  overflow: auto;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+  height: 65px;
+}
+
+.chenyun-right-layout-header-right-flex {
+  /*height:100%;*/
+  padding-left:24px;
+  padding-right:24px;
+  height: 65px;
+}
+
+.chenyun-left-sider-logo {
+  height: 64px;
+  font-family: '华文行楷', sans-serif; /* 指定宋体为首选字体，如果不支持则使用默认的无衬线字体 */
+  color: #FFA500; /* 橙色，使用十六进制颜色代码 */
+  font-size: 24px; /* 字体大小，可以根据需要调整 */
+  font-weight: bold; /* 字体加粗，使标题更加醒目 */
+  text-align: center; /* 文本居中，如果标题需要居中显示 */
+  padding-bottom: 20px;
+  background-color: rgba(77, 77, 112, 0.37);
+}
+.chenyun-left-sider-logo-text {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.chenyun-left-sider-logo-text.visible {
+  display: block;
+  white-space: nowrap;
+  opacity: 1;
+}
+
+.ant-layout-sider-children .ant-menu-item-selected {
+  background-color: rgba(231, 195, 141, 0);
+  color: #e7c38d;
+}
+
+.chenyun-right-layout {
+  background-color: rgba(94, 94, 101, 0.2);
+}
+
+.chenyun-right-layout-header {
+  position: relative;
+}
+
+.chenyun-github {
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  height: 65px;
+  transition: color 0.5s ease;
+  transition: font-size 0.5s ease;
+}
+.chenyun-github:hover {
+  font-size: 20px;
+  text-decoration: underline;
+  color: #FFA500;
+}
+
+/*.chenyun-right-layout-header-search .ant-input:hover {*/
+/*  border-color: orange;*/
+/*}*/
+/*.chenyun-right-layout-header-search .ant-input:focus {*/
+/*  border-color: orange;*/
+/*}*/
+
+/*.chenyun-right-layout-header-search .ant-btn:hover {*/
+/*  border-color: orange !important;*/
+/*}*/
+
+.chenyun-right-layout-header-username {
+  height: 64px;
+  width: 80px;
+  cursor: pointer;
+  transition: color 0.5s ease;
+}
+.chenyun-right-layout-header-username:hover {
+  color: orange;
+}

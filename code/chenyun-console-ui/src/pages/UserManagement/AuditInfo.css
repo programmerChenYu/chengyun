@@ -1,0 +1,38 @@
+/*用户待审核基本信息主体*/
+.chenyun-user-content-audit-info {
+    border: 1px solid rgba(169, 169, 169, 0.5);
+    height: 60vh;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px 1px rgba(169, 169, 169, 0.3)
+}
+
+/*用户待审核基本信息标题*/
+.chenyun-user-content-audit-info-title {
+    padding-left: 10px;
+    height: 5vh;
+    font-weight: bold;
+    font-size: 16px;
+    border-bottom: 2px solid rgba(169, 169, 169, 0.2);
+}
+.chenyun-user-content-audit-info-title-back {
+    transition: width 0.5s ease;
+    transition: height 0.5s ease;
+}
+.chenyun-user-content-audit-info-title-back:hover {
+    height: 25px;
+    width: 25px;
+    cursor: pointer;
+}
+
+/*用户待审核基本信息头像*/
+.chenyun-user-content-audit-info-avatar {
+    height: 55vh;
+    overflow: auto;
+}
+
+/*用户待审核基本信息表单内容*/
+.chenyun-user-content-audit-info-form {
+    /*border: 1px solid;*/
+    width: 50vw;
+    height: 60vh;
+}

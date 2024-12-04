@@ -1,0 +1,88 @@
+.chenyun-blog-info-back {
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.5s ease;
+}
+.chenyun-blog-info-back:hover {
+    color: orange;
+}
+
+.chenyun-blog-info-content {
+    height: 82vh;
+    width: 78vw;
+    background-color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/*右边栏的设置*/
+.chenyun-blog-info-right {
+    height: 85vh;
+    width: 10vw;
+    background-color: white;
+    overflow: auto;
+}
+
+/*版权信息*/
+.chenyun-blog-info-author {
+    margin-top: -10px;
+    height: 5vh;
+    color: rgba(110, 107, 107, 0.8);
+}
+
+
+/*文章内容css设置*/
+.editor-content-view {
+    overflow: auto;
+}
+
+.editor-content-view::-webkit-scrollbar {
+    width: 0;  /* 隐藏垂直滚动条 */
+    height: 0; /* 隐藏水平滚动条 */
+}
+
+.editor-content-view p,
+.editor-content-view li {
+    white-space: pre-wrap; /* 保留空格 */
+}
+
+.editor-content-view blockquote {
+    border-left: 8px solid #d0e5f2;
+    padding: 10px 10px;
+    margin: 10px 0;
+    background-color: #f1f1f1;
+}
+
+.editor-content-view code {
+    font-family: monospace;
+    background-color: #eee;
+    padding: 3px;
+    border-radius: 3px;
+}
+.editor-content-view pre>code {
+    display: block;
+    padding: 10px;
+}
+
+.editor-content-view table {
+    border-collapse: collapse;
+}
+.editor-content-view td,
+.editor-content-view th {
+    border: 1px solid #ccc;
+    min-width: 50px;
+    height: 20px;
+}
+.editor-content-view th {
+    background-color: #f1f1f1;
+}
+
+.editor-content-view ul,
+.editor-content-view ol {
+    padding-left: 20px;
+}
+
+.editor-content-view input[type="checkbox"] {
+    margin-right: 5px;
+}

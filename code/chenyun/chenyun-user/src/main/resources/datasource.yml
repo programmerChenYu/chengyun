@@ -1,0 +1,54 @@
+# mysql 数据源配置
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: hl9BDFCzzlNr01Z915ffGA0nBLvD/sVzLnDDA3zSRBZpt3wWqbycN8nlNoTo5fUFT6yrZIlqZCQ2aQcjMNSvdw==
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.116.131:3308/chenyun?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSl=true
+    druid:
+      # 初始连接数
+      initial-size: 20
+      # 最小连接池数量
+      min-idle: 20
+      # 最大连接池数量
+      max-active: 100
+      # 配置获取连接等待超时的时间
+      max-wait: 60000
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: chenyun
+        login-password: chenyun
+        # 设置白名单，不填则允许所有访问
+        allow:
+      filter:
+        stat:
+          enabled: true
+          slow-sql-millis: 2000
+          log-slow-sql: true
+          merge-sql: true
+        wall:
+          enabled: true
+          config:
+            multi-statement-allow: true
+        config:
+          enabled: true
+      # 配置连接超时时间
+      connect-timeout: 30000
+      # 配置网络超时时间
+      socket-timeout: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空连接，单位是毫秒
+      time-between-eviction-runs-millis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 300000
+      # 配置检测连接是否有效
+      validation-query: SELECT * FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      web-stat-filter:
+        enabled: true
+      connection-properties: config.decrypt=true;config.decrypt.key=${publicKey};
+
+publicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJl26qClFJQFLnLRGAZCjo8Qg3hFznajdRruxF/wstE1TPq497pGd2rAp4jo0Uf4xDogY7UMLZhmR5P6lbGgZssCAwEAAQ==

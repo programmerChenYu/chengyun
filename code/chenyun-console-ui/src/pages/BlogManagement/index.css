@@ -1,0 +1,42 @@
+/*博客管理标志*/
+.chenyun-blog-title {
+    width: 100%;
+    height: 50px;
+    font-weight: bold;
+    font-size: 20px;
+    padding-left: 24px;
+    background-color: white;
+}
+
+/*搜索部分*/
+.chenyun-blog-content-search {
+    /*border: 1px solid;*/
+}
+.chenyun-blog-content-search-blogTitle {
+    width: 62px;
+}
+.chenyun-blog-content-search-status {
+    width: 35px;
+}
+
+/*路由部分*/
+.chenyun-blog-content-rout{
+    padding-top: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/*博客管理内容*/
+.chenyun-blog-content {
+    width: 98%;
+    height: 75vh;
+    background-color: white;
+    overflow: auto;
+}
+
+
+/*版权信息*/
+.chenyun-blog-author {
+    height: 5vh;
+    color: rgba(110, 107, 107, 0.8);
+}
