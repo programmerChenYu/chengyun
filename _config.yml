@@ -1,0 +1,8 @@
+title: 开源博客-橙云
+description: 一个开源项目用于熟悉前后端开发技术，并拥有一款属于自己的博客网站
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+author:
+  name: 陈宇
+  email: 850504287@qq.com
