@@ -30,4 +30,21 @@ public class RedisPrefixConstant {
     public static final String TAG_SEQUENCE = "sequence:tag:id";
     public static final String USER_SEQUENCE = "sequence:user:id";
 
+    /**
+     * 用户权限前缀
+     */
+    public static final String USER_PERMISSION = "user:permissions:";
+
+    /**
+     * 热门标签的前缀
+     */
+    public static final String HOT_TAG = "blog:hot:tag";
+    /**
+     * 用户所在的热门城市（前 15 名）
+     */
+    public static final String HOT_CITY_USER_IN = "location:hot:city";
+    /**
+     * 用户访问量
+     */
+    public static final String USER_ACCESS_NUM = "user:access:num";
 }

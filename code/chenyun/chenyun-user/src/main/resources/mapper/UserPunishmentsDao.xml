@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.programmercy.infra.mapper.UserPunishmentsDao">
+
+    <resultMap type="com.programmercy.infra.po.UserPunishments" id="UserPunishmentsMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="startTime" column="start_time" jdbcType="VARCHAR"/>
+        <result property="endTime" column="end_time" jdbcType="VARCHAR"/>
+        <result property="punishmentLevel" column="punishment_level" jdbcType="INTEGER"/>
+        <result property="reason" column="reason" jdbcType="VARCHAR"/>
+        <result property="revokedPermissions" column="revoked_permissions" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserPunishmentsMap">
+        select id,
+               user_id,
+               type,
+               start_time,
+               end_time,
+               punishment_level,
+               reason,
+               revoked_permissions
+        from user_punishments
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserPunishmentsMap">
+        select
+        id, user_id, type, start_time, end_time, punishment_level, reason, revoked_permissions
+        from user_punishments
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and start_time = #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and end_time = #{endTime}
+            </if>
+            <if test="punishmentLevel != null">
+                and punishment_level = #{punishmentLevel}
+            </if>
+            <if test="reason != null and reason != ''">
+                and reason = #{reason}
+            </if>
+            <if test="revokedPermissions != null and revokedPermissions != ''">
+                and revoked_permissions = #{revokedPermissions}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user_punishments
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and start_time = #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and end_time = #{endTime}
+            </if>
+            <if test="punishmentLevel != null">
+                and punishment_level = #{punishmentLevel}
+            </if>
+            <if test="reason != null and reason != ''">
+                and reason = #{reason}
+            </if>
+            <if test="revokedPermissions != null and revokedPermissions != ''">
+                and revoked_permissions = #{revokedPermissions}
+            </if>
+        </where>
+    </select>
+
+    <!--  根据用户 id，获取其惩罚记录  -->
+    <select id="queryByUserId" resultType="com.programmercy.infra.po.UserPunishments">
+        select id,
+               user_id,
+               type,
+               start_time,
+               end_time,
+               punishment_level,
+               reason,
+               revoked_permissions
+        from user_punishments
+        where user_id = #{userId}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into user_punishments(user_id, type, start_time, end_time, punishment_level, reason, revoked_permissions)
+        values (#{userId}, #{type}, #{startTime}, #{endTime}, #{punishmentLevel}, #{reason}, #{revokedPermissions})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user_punishments(user_id, type, start_time, end_time, punishment_level, reason, revoked_permissions)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.type}, #{entity.startTime}, #{entity.endTime}, #{entity.punishmentLevel},
+            #{entity.reason}, #{entity.revokedPermissions})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user_punishments(user_id, type, start_time, end_time, punishment_level, reason, revoked_permissions)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.type}, #{entity.startTime}, #{entity.endTime}, #{entity.punishmentLevel},
+            #{entity.reason}, #{entity.revokedPermissions})
+        </foreach>
+        on duplicate key update
+        user_id = values(user_id),
+        type = values(type),
+        start_time = values(start_time),
+        end_time = values(end_time),
+        punishment_level = values(punishment_level),
+        reason = values(reason),
+        revoked_permissions = values(revoked_permissions)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user_punishments
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="startTime != null and startTime != ''">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null and endTime != ''">
+                end_time = #{endTime},
+            </if>
+            <if test="punishmentLevel != null">
+                punishment_level = #{punishmentLevel},
+            </if>
+            <if test="reason != null and reason != ''">
+                reason = #{reason},
+            </if>
+            <if test="revokedPermissions != null and revokedPermissions != ''">
+                revoked_permissions = #{revokedPermissions},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from user_punishments
+        where id = #{id}
+    </delete>
+
+</mapper>
+

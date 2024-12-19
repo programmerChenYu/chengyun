@@ -19,7 +19,7 @@ const TopUserList = () => {
     useEffect(() => {
         const getTopUserList = async () => {
             try {
-                // TODO 1.获取各省份用户人数，前五名
+                // 1.获取各省份用户人数，前五名
                 const res = await numberOfUsersByProvinceAPI(popularRegionLevel.level, popularRegionLevel.name);
                 // setTopUserListData(res.data)
                 dispatch(setState(res.data.data));

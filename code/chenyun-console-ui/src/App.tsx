@@ -11,14 +11,23 @@ import {Layout, Menu, Avatar, Flex, ConfigProvider, Tooltip, MenuProps, Dropdown
 import React, {useEffect, useState} from 'react';
 const { Header, Sider, } = Layout;
 import './App.css';
-import {Link, Outlet, useLocation} from "react-router-dom";
+import {Link, Outlet, useLocation, useNavigate} from "react-router-dom";
 import zhCN from 'antd/locale/zh_CN';
+import {UserInterface} from "./interface";
+import {getLoginUserInfoAPI} from "./apis/Auth/getLoginUserInfoAPI.tsx";
+import {checkToken} from "./utils";
+import {logoutAPI} from "./apis/Auth/logoutAPI.tsx";
 
 function App() {
     const [collapsed, setCollapsed] = useState<boolean>(false);
 
     const [selectedKey, setSelectedKey] = useState<string[]>();
     const location = useLocation();
+
+    const navigate = useNavigate();
+
+    // 登录的用户信息
+    const [userInfo, setUserInfo] = useState<UserInterface|null>(null)
 
     const items: MenuProps['items'] = [
         {
@@ -30,10 +39,33 @@ function App() {
 
     // 退出登录按钮点击事件
     const onClick: MenuProps['onClick'] = () => {
-        console.log('点击退出')
+        const logout = async () => {
+            const res = await logoutAPI();
+            if (res.data.data === true) {
+                localStorage.removeItem('cyToken');
+                navigate("/login");
+            }
+        }
+        logout();
     };
 
     useEffect(() => {
+        const token = localStorage.getItem('cyToken');
+        if (token == null) {
+            navigate("/login")
+        }
+        // 获取用户信息
+        const getLoginUserInfo = async () => {
+            try {
+                const res = await getLoginUserInfoAPI(token);
+                if (!checkToken.check(res.data.msg)) {
+                    navigate("/login");
+                }
+                setUserInfo(res.data.data);
+            } catch (error) {
+            }
+        }
+        getLoginUserInfo();
         // 根据当前路由设置 selectedKeys
         const path = '/' + location.pathname.split('/')[1]
         if (path === '/') {
@@ -133,9 +165,9 @@ function App() {
                                 </Tooltip>
 
                                 <Flex align={"center"} gap={"small"}>
-                                    <Avatar className="chenyun-right-layout-header-avater" icon={<UserOutlined />} />
+                                    <Avatar className="chenyun-right-layout-header-avater" src={userInfo?.avatar} shape={"circle"} icon={<UserOutlined />} />
                                     <Dropdown menu={{items, onClick}}>
-                                        <span className={"chenyun-right-layout-header-username"}>管理员</span>
+                                        <span className={"chenyun-right-layout-header-username"}>{userInfo?.nickname}</span>
                                     </Dropdown>
                                 </Flex>
                             </Flex>

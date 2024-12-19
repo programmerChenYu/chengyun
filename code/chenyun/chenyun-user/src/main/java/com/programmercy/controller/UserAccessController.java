@@ -20,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/access")
 @Slf4j
+@SuppressWarnings("unchecked")
 public class UserAccessController {
 
     @Resource
@@ -32,7 +33,7 @@ public class UserAccessController {
         try {
             return Result.ok(userAccessLogsServiceDomain.userVisitsInTheLastWeek());
         } catch (Exception e) {
-            log.error("chenyun-user:UserAccessController:userVisitsInTheLastWeek:Exception:【{}】", e.getStackTrace());
+            log.error("chenyun-user:UserAccessController:userVisitsInTheLastWeek:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return Result.fail(null);
         }
     }

@@ -1,16 +1,14 @@
 package com.programmercy.controller;
 
 import com.google.common.base.Preconditions;
+import com.programmercy.constant.ExceptionLanguageConstant;
 import com.programmercy.domain.service.UserDistributionDomainService;
 import com.programmercy.entity.Result;
 import com.programmercy.vo.DistributionOfPopularCitiesVO;
 import com.programmercy.vo.UserDistributionVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,6 +20,8 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@RequestMapping("/userGeographic")
+@SuppressWarnings("unchecked")
 public class UserGeographicController {
 
     @Resource
@@ -30,30 +30,34 @@ public class UserGeographicController {
     /**
      * 统计用户分布信息
      */
-    @GetMapping("/userDistribution/{level}")
+    @GetMapping("/{level}")
     public Result<List<UserDistributionVO>> userDistribution(@PathVariable("level") Integer level,
                                                              @RequestParam(value = "name", required = false) String name) {
-        Preconditions.checkNotNull(level, "参数不能为空");
-        Preconditions.checkArgument(level >= 0, "参数不符合规范，查询级别小于 0");
-        Preconditions.checkArgument(level <= 2, "参数不符合规范，查询级别高于 2");
-        if (name == null && level == 1) {
-            name = "中国";
-        } else if (name == null && level != 0) {
-            Preconditions.checkNotNull(name, "参数不能为空");
+        try {
+            Preconditions.checkNotNull(level, ExceptionLanguageConstant.ARGUMENT_NULL_EXCEPTION);
+            Preconditions.checkArgument(level >= 0, ExceptionLanguageConstant.GEO_LESS_THEN_EXCEPTION);
+            Preconditions.checkArgument(level <= 2, ExceptionLanguageConstant.GEO_GREATER_THEN_EXCEPTION);
+            if (name == null && level == 1) {
+                name = "中国";
+            } else if (name == null && level != 0) {
+                Preconditions.checkNotNull(name, ExceptionLanguageConstant.ARGUMENT_NULL_EXCEPTION);
+            }
+            return Result.ok(userDistributionDomainService.getUserDistributionInfo(level, name));
+        } catch (Exception e) {
+            log.error("chenyun-user:controller:UserGeographicController:userDistribution:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
+            return Result.fail(null);
         }
-        List<UserDistributionVO> userDistributionVOS = userDistributionDomainService.getUserDistributionInfo(level, name);
-        return Result.ok(userDistributionVOS);
     }
 
     /**
      * 热门城市分布（前 15 名）
      */
-    @GetMapping("/userGeographic/distributionOfPopularCities")
+    @GetMapping("/distributionOfPopularCities")
     public Result<DistributionOfPopularCitiesVO> distributionOfPopularCities() {
         try {
             return Result.ok(userDistributionDomainService.distributionOfPopularCities());
         } catch (Exception e) {
-            log.error("chenyun-user:UserGeographicController:distributionOfPopularCities:Exception:【{}】", e.getStackTrace());
+            log.error("chenyun-user:controller:UserGeographicController:distributionOfPopularCities:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return Result.fail(null);
         }
     }

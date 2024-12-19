@@ -107,6 +107,8 @@ const UserManagement = () => {
         },
     ];
     const currentRouteOnClick: MenuProps['onClick'] = (e) => {
+        setSearchValue("");
+        setStatusValue(undefined);
         setCurrentRoute(e.key);
     };
 
@@ -122,7 +124,10 @@ const UserManagement = () => {
             } else {
                 setIsVisible(false);
             }
-            setSelectedUserRowKeys(newSelectedRowKeys)
+            const keys:React.Key[] = [];
+            keys.push(...selectedUserRowKeys);
+            keys.push(...newSelectedRowKeys);
+            setSelectedUserRowKeys(keys);
         }
     }
     // 清空管理列表中选中的

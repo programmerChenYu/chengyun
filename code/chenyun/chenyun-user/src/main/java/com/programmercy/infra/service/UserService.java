@@ -221,4 +221,12 @@ public interface UserService {
      * @return
      */
     Long countAuditUsersByNickname(String nickname);
+
+    /**
+     * 根据用户名和密码查询用户
+     * @param username
+     * @param password
+     * @return
+     */
+    User queryByUsernameAndPassword(String username, String password);
 }

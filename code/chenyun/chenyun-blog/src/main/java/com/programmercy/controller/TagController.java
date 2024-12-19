@@ -1,5 +1,6 @@
 package com.programmercy.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
 import com.programmercy.constant.ExceptionLanguageConstant;
 import com.programmercy.domain.service.TagServiceDomain;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/tag")
 @Slf4j
+@SuppressWarnings("unchecked")
 public class TagController {
 
     @Resource
@@ -30,6 +34,8 @@ public class TagController {
 
     @Resource
     private RsaEncodeUtil rsaEncodeUtil;
+    @Resource
+    private ExecutorService tagThreadPool;
 
     /**
      * 分页查询标签列表
@@ -39,17 +45,25 @@ public class TagController {
         try {
             Preconditions.checkArgument(pageInfoVO.getPageSize() > 0, ExceptionLanguageConstant.PAGE_SIZE_EXCEPTION);
             Preconditions.checkArgument(pageInfoVO.getCurrentPage() > 0, ExceptionLanguageConstant.CURRENT_PAGE_EXCEPTION);
-            log.info("chenyun-blog:TagController:pagingQueryTagList:VO, {}", pageInfoVO);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:pagingQueryTagList:pageInfoVO: [{}]", JSON.toJSONString(pageInfoVO));
+            }
             // 获取分页的标签列表
-            List<TagVO> tagVOList = tagServiceDomain.pagingQueryTagList(pageInfoVO.getCurrentPage(), pageInfoVO.getPageSize());
+            CompletableFuture<List<TagVO>> tagVOListFuture = CompletableFuture.supplyAsync(() -> {
+                return tagServiceDomain.pagingQueryTagList(pageInfoVO.getCurrentPage(), pageInfoVO.getPageSize());
+            }, tagThreadPool);
             // 获取标签总数
-            Long count = tagServiceDomain.tagCount();
+            CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() -> {
+                return tagServiceDomain.tagCount();
+            }, tagThreadPool);
             PagingQueryTagListVO queryTagListVO = new PagingQueryTagListVO();
-            queryTagListVO.setTagList(tagVOList);
-            queryTagListVO.setCountOfPage(count);
+            tagVOListFuture.thenAcceptBoth(countFuture, (tagVOList, count) -> {
+                queryTagListVO.setTagList(tagVOList);
+                queryTagListVO.setCountOfPage(count);
+            }).get();
             return Result.ok(queryTagListVO);
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:pagingQueryTagList:Exception, {}", e.getMessage());
+            log.error("chenyun-blog:controller:TagController:pagingQueryTagList:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return Result.fail(null);
         }
     }
@@ -61,12 +75,13 @@ public class TagController {
     public Result<Boolean> deactivateTag(@RequestBody TagVO tagVO) {
         try {
             Preconditions.checkNotNull(tagVO.getKey(), ExceptionLanguageConstant.TAG_ID_NULL_EXCEPTION);
-            log.info("chenyun-blog:TagController:deactivateTag:tagId, {}", tagVO.getKey());
-            Boolean res = tagServiceDomain.deactivateTag(Long.valueOf(tagVO.getKey()));
-            return Result.ok(res);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:deactivateTag:tagVO: [{}]", JSON.toJSONString(tagVO));
+            }
+            return Result.ok(tagServiceDomain.deactivateTag(Long.valueOf(tagVO.getKey())));
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:deactivateTag:Exception, {}", e.getMessage());
-            return Result.fail(false);
+            log.error("chenyun-blog:controller:TagController:deactivateTag:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
+            return Result.fail(null);
         }
     }
 
@@ -77,12 +92,13 @@ public class TagController {
     public Result<Boolean> enableTag(@RequestBody TagVO tagVO) {
         try {
             Preconditions.checkNotNull(tagVO.getKey(), ExceptionLanguageConstant.TAG_ID_NULL_EXCEPTION);
-            log.info("chenyun-blog:TagController:enableTag:tagId, {}", tagVO.getKey());
-            Boolean res = tagServiceDomain.enableTag(Long.valueOf(tagVO.getKey()));
-            return Result.ok(res);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:enableTag:tagVO: [{}]", JSON.toJSONString(tagVO));
+            }
+            return Result.ok(tagServiceDomain.enableTag(Long.valueOf(tagVO.getKey())));
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:enableTag:Exception, {}", e.getMessage());
-            return Result.fail(false);
+            log.error("chenyun-blog:controller:TagController:enableTag:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
+            return Result.fail(null);
         }
     }
 
@@ -93,10 +109,12 @@ public class TagController {
     public Result<Boolean> deleteTag(@PathVariable("tagId") String tagId) {
         try {
             Preconditions.checkNotNull(tagId, ExceptionLanguageConstant.TAG_ID_NULL_EXCEPTION);
-            log.info("chenyun-blog:TagController:enableTag:tagId, {}", tagId);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:deleteTag:tagId: [{}]", JSON.toJSONString(tagId));
+            }
             return Result.ok(tagServiceDomain.deleteTag(Long.valueOf(tagId)));
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:deleteTag:Exception, {}", e.getMessage());
+            log.error("chenyun-blog:controller:TagController:deleteTag:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return Result.fail(false);
         }
     }
@@ -109,16 +127,17 @@ public class TagController {
         try {
             Preconditions.checkArgument(tagVO.getTagName() != null, ExceptionLanguageConstant.TAG_NAME_NULL_EXCEPTION);
             Preconditions.checkArgument(tagVO.getTagName() != "", ExceptionLanguageConstant.TAG_NAME_NULL_EXCEPTION);
-            log.info("chenyun-blog:TagController:createTag:tagName, {}", tagVO.getTagName());
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:createTag:tagVO: [{}]", JSON.toJSONString(tagVO));
+            }
             Integer tagStatus = tagVO.getTagStatus();
             if (tagStatus == null) {
                 tagStatus = 0;
             }
-            log.info("chenyun-blog:TagController:createTag:tagStatus, {}", tagStatus);
             return Result.ok(tagServiceDomain.createTag(tagVO.getTagName(), tagStatus));
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:createTag:Exception, {}", e.getMessage());
-            return Result.fail(false);
+            log.error("chenyun-blog:controller:TagController:createTag:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
+            return Result.fail(null);
         }
     }
 
@@ -130,14 +149,16 @@ public class TagController {
         try {
             Preconditions.checkNotNull(tagBatchOptionVO.getTagIds(), ExceptionLanguageConstant.BATCH_TAG_ID_NULL_EXCEPTION);
             Preconditions.checkArgument(tagBatchOptionVO.getTagIds().size() > 0, ExceptionLanguageConstant.BATCH_TAG_ID_NULL_EXCEPTION);
-            log.info("chenyun-blog:TagController:batchDeactivate:tagIds, {}", tagBatchOptionVO.getTagIds());
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:batchDeactivate:tagBatchOptionVO: [{}]", JSON.toJSONString(tagBatchOptionVO));
+            }
             List<Long> tagIds = tagBatchOptionVO.getTagIds().stream().map((tagId) -> {
                 return Long.valueOf(tagId);
             }).collect(Collectors.toList());
             return Result.ok(tagServiceDomain.batchDeactivate(tagIds));
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:batchDeactivate:Exception, {}", e.getMessage());
-            return Result.fail(false);
+            log.error("chenyun-blog:controller:TagController:batchDeactivate:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
+            return Result.fail(null);
         }
     }
 
@@ -149,14 +170,16 @@ public class TagController {
         try {
             Preconditions.checkNotNull(tagBatchOptionVO.getTagIds(), ExceptionLanguageConstant.BATCH_TAG_ID_NULL_EXCEPTION);
             Preconditions.checkArgument(tagBatchOptionVO.getTagIds().size() > 0, ExceptionLanguageConstant.BATCH_TAG_ID_NULL_EXCEPTION);
-            log.info("chenyun-blog:TagController:batchEnable:tagIds, {}", tagBatchOptionVO.getTagIds());
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:batchEnable:tagBatchOptionVO: [{}]", JSON.toJSONString(tagBatchOptionVO));
+            }
             List<Long> tagIds = tagBatchOptionVO.getTagIds().stream().map((tagId) -> {
                 return Long.valueOf(tagId);
             }).collect(Collectors.toList());
             return Result.ok(tagServiceDomain.batchEnable(tagIds));
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:batchEnable:Exception, {}", e.getMessage());
-            return Result.fail(false);
+            log.error("chenyun-blog:controller:TagController:batchEnable:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
+            return Result.fail(null);
         }
     }
 
@@ -169,6 +192,9 @@ public class TagController {
             Preconditions.checkArgument((pagingQuerySearchTagListVO.getTagName() != null || pagingQuerySearchTagListVO.getTagName() != "")
                     && (pagingQuerySearchTagListVO.getTagStatus() != null || pagingQuerySearchTagListVO.getTagStatus() != ""),
                     ExceptionLanguageConstant.SEARCH_TAG_NAME_AND_STATUS_NULL_EXCEPTION);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:controller:TagController:pagingQuerySearchTagList:pagingQuerySearchTagListVO: [{}]", JSON.toJSONString(pagingQuerySearchTagListVO));
+            }
             if (pagingQuerySearchTagListVO.getTagName() != null) {
                 byte[] decodeName = Base64.getDecoder().decode(pagingQuerySearchTagListVO.getTagName());
                 byte[] tagNameByte = rsaEncodeUtil.encodeRsaMessage(decodeName);
@@ -179,17 +205,22 @@ public class TagController {
                 byte[] tagStatusByte = rsaEncodeUtil.encodeRsaMessage(decodeStatus);
                 pagingQuerySearchTagListVO.setTagStatus(new String(tagStatusByte, "UTF-8"));
             }
-            log.info("chenyun-blog:TagController:pagingQuerySearchTagList:pagingQuerySearchTagListVO, {}", pagingQuerySearchTagListVO);
             // 获取分页的搜索标签列表
-            List<TagVO> tagVOList = tagServiceDomain.pagingQuerySearchTagList(pagingQuerySearchTagListVO);
+            CompletableFuture<List<TagVO>> tagVOListFuture = CompletableFuture.supplyAsync(() -> {
+                return tagServiceDomain.pagingQuerySearchTagList(pagingQuerySearchTagListVO);
+            }, tagThreadPool);
             // 获取搜索的标签总数
-            Long count = tagServiceDomain.searchTagCount(pagingQuerySearchTagListVO.getTagName(), pagingQuerySearchTagListVO.getTagStatus());
+            CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() -> {
+                return tagServiceDomain.searchTagCount(pagingQuerySearchTagListVO.getTagName(), pagingQuerySearchTagListVO.getTagStatus());
+            }, tagThreadPool);
             PagingQueryTagListVO queryTagListVO = new PagingQueryTagListVO();
-            queryTagListVO.setTagList(tagVOList);
-            queryTagListVO.setCountOfPage(count);
+            tagVOListFuture.thenAcceptBoth(countFuture, (tagVOList, count) -> {
+                queryTagListVO.setTagList(tagVOList);
+                queryTagListVO.setCountOfPage(count);
+            }).get();
             return Result.ok(queryTagListVO);
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:pagingQuerySearchTagList:Exception, {}", e.getMessage());
+            log.error("chenyun-blog:controller:TagController:pagingQuerySearchTagList:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return Result.fail(null);
         }
     }
@@ -202,7 +233,7 @@ public class TagController {
         try {
             return Result.ok(tagServiceDomain.hotTagRank());
         } catch (Exception e) {
-            log.error("chenyun-blog:TagController:hotTagRank:Exception, {}", e.getStackTrace());
+            log.error("chenyun-blog:controller:TagController:hotTagRank:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return Result.fail(null);
         }
     }

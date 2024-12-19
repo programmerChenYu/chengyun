@@ -142,8 +142,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="blogPostId" useGeneratedKeys="true">
-        insert into blog_post(title, content, author_id, status, views, likes, bookmarks_count, created_at, updated_at)
-        values (#{title}, #{content}, #{authorId}, #{status}, #{views}, #{likes}, #{bookmarksCount}, #{createdAt},
+        insert into blog_post(blog_post_id, title, content, author_id, status, views, likes, bookmarks_count, created_at, updated_at)
+        values (#{blogPostId}, #{title}, #{content}, #{authorId}, #{status}, #{views}, #{likes}, #{bookmarksCount}, #{createdAt},
                 #{updatedAt})
     </insert>
 

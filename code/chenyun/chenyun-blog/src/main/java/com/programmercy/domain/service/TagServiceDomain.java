@@ -4,6 +4,7 @@ import com.programmercy.vo.PagingQuerySearchTagListVO;
 import com.programmercy.vo.TagVO;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Description: 标签服务类，领域层
@@ -89,5 +90,5 @@ public interface TagServiceDomain {
      * 获取标签的使用排行
      * @return
      */
-    List<TagVO> hotTagRank();
+    List<TagVO> hotTagRank() throws ExecutionException, InterruptedException;
 }

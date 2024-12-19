@@ -154,7 +154,7 @@
     <select id="queryUsersByPageInfo" resultType="com.programmercy.infra.po.User">
         select user_id, created_at, info_status, location_id, nickname, user_status, role
         from user
-        where role = 1 LIMIT #{target}
+        where role = 2 LIMIT #{target}
             , #{pageSize}
     </select>
 
@@ -171,7 +171,7 @@
     <select id="queryUsersAuditByPageInfo" resultType="com.programmercy.infra.po.User">
         select user_id, created_at, location_id, nickname
         from user
-        where role = 1
+        where role = 2
           and info_status = 0 LIMIT #{target}
             , #{pageSize}
     </select>
@@ -180,7 +180,7 @@
     <select id="queryUsersByNicknameAndStatus" resultType="com.programmercy.infra.po.User">
         SELECT user_id, created_at, info_status, location_id, nickname, user_status
         from user
-        where role = 1
+        where role = 2
           and user_status = #{userStatus}
           and nickname like concat('%', #{nickname}, '%') limit #{target}
             , #{pageSize}
@@ -190,7 +190,7 @@
     <select id="queryUserByIdAndStatus" resultType="com.programmercy.infra.po.User">
         SELECT user_id, created_at, info_status, location_id, nickname, user_status
         from user
-        where role = 1
+        where role = 2
           and user_status = #{userStatus}
           and user_id = #{userId}
     </select>
@@ -199,7 +199,7 @@
     <select id="queryUsersByNickname" resultType="com.programmercy.infra.po.User">
         SELECT user_id, created_at, info_status, location_id, nickname, user_status
         from user
-        where role = 1
+        where role = 2
           and nickname like concat('%', #{nickname}, '%') limit #{target}
             , #{pageSize}
     </select>
@@ -208,7 +208,7 @@
     <select id="queryUserById" resultType="com.programmercy.infra.po.User">
         SELECT user_id, created_at, info_status, location_id, nickname, user_status
         from user
-        where role = 1
+        where role = 2
           and user_id = #{userId}
     </select>
 
@@ -216,7 +216,7 @@
     <select id="queryUsersByStatus" resultType="com.programmercy.infra.po.User">
         SELECT user_id, created_at, info_status, location_id, nickname, user_status
         from user
-        where role = 1
+        where role = 2
           and user_status = #{userStatus} limit #{target}
             , #{pageSize}
     </select>
@@ -225,7 +225,7 @@
     <select id="countUsersByNicknameAndStatus" resultType="java.lang.Long">
         select count(1)
         from user
-        where role = 1
+        where role = 2
           and user_status = #{userStatus}
           and nickname like concat('%', #{nickname}, '%')
     </select>
@@ -234,7 +234,7 @@
     <select id="countUsersByNickname" resultType="java.lang.Long">
         select count(1)
         from user
-        where role = 1
+        where role = 2
           and nickname like concat('%', #{nickname}, '%')
     </select>
 
@@ -242,7 +242,7 @@
     <select id="countUsersByStatus" resultType="java.lang.Long">
         select count(1)
         from user
-        where role = 1
+        where role = 2
           and user_status = #{userStatus}
     </select>
 
@@ -250,7 +250,7 @@
     <select id="queryAuditUsersByNickname" resultType="com.programmercy.infra.po.User">
         SELECT user_id, created_at, info_status, location_id, nickname, user_status
         from user
-        where role = 1
+        where role = 2
           and info_status = 0
           and nickname like concat('%', #{nickname}, '%') limit #{target}
             , #{pageSize}
@@ -260,17 +260,25 @@
     <select id="countAuditUsersByNickname" resultType="java.lang.Long">
         select count(1)
         from user
-        where role = 1
+        where role = 2
           and info_status = 0
           and nickname like concat('%', #{nickname}, '%')
     </select>
 
+    <!--  根据用户名和密码查询用户  -->
+    <select id="queryByUsernameAndPassword" resultType="com.programmercy.infra.po.User">
+        select user_id, role, avatar, created_at, info_status, location_id, nickname, user_status
+        from user
+        where username = #{username}
+          and password = #{password}
+    </select>
+
     <!--新增所有列-->
     <insert id="insert" keyProperty="userId" useGeneratedKeys="true">
-        insert into user(username, password, role, avatar, email, created_at, location_id, nickname, user_status,
+        insert into user(user_id, username, password, role, avatar, email, created_at, location_id, nickname, user_status,
                          information, info_status, review_info)
-        values (#{username}, #{password}, #{role}, #{avatar}, #{email}, #{createdAt},
-                #{locationId}), #{nickname}, #{userStatus}, #{information}, #{infoStatus}, #{reviewInfo}
+        values (#{userId}, #{username}, #{password}, #{role}, #{avatar}, #{email}, #{createdAt},
+                #{locationId}, #{nickname}, #{userStatus}, #{information}, #{infoStatus}, #{reviewInfo})
     </insert>
 
     <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">

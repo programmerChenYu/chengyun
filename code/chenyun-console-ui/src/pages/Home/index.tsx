@@ -11,6 +11,7 @@ import {getNumberOfUserInfoAuditAPI} from "../../apis/UserManagement/getNumberOf
 import {reviewedBlogPostCountAPI} from "../../apis/Home/reviewedBlogPostCountAPI.tsx";
 import {TagInterface} from "../../interface";
 import {hotTagRankAPI} from "../../apis/Home/hotTagRankAPI.tsx";
+import {checkToken} from "../../utils";
 
 
 const Home = () => {
@@ -79,20 +80,38 @@ const Home = () => {
     useEffect(() => {
         // 获取有多少条待审核文章
         const reviewedBlogPostCount = async () => {
-            const res = await reviewedBlogPostCountAPI();
-            setReviewedArticleCount(res.data.data);
+            try {
+                const res = await reviewedBlogPostCountAPI();
+                setReviewedArticleCount(res.data.data);
+                if (!checkToken.check(res.data.msg)) {
+                    navigate("/login");
+                }
+            } catch (error) {
+            }
         }
         // 获取有多少用户信息待审核
         const getNumberOfUserInfoAudit = async () => {
-            const res = await getNumberOfUserInfoAuditAPI();
-            setUserInfoAuditCount(res.data.data);
+            try {
+                const res = await getNumberOfUserInfoAuditAPI();
+                setUserInfoAuditCount(res.data.data);
+                if (!checkToken.check(res.data.msg)) {
+                    navigate("/login");
+                }
+            } catch (error) {
+            }
         }
         // 获取热门分类
         const hotTagRank = async () => {
-            const res = await hotTagRankAPI();
-            setHotTagOne(res.data.data[0]);
-            setHotTagTwo(res.data.data[1]);
-            setHotTagThree(res.data.data[2]);
+            try {
+                const res = await hotTagRankAPI();
+                setHotTagOne(res.data.data[0]);
+                setHotTagTwo(res.data.data[1]);
+                setHotTagThree(res.data.data[2]);
+                if (!checkToken.check(res.data.msg)) {
+                    navigate("/login");
+                }
+            } catch (error) {
+            }
         }
         reviewedBlogPostCount();
         getNumberOfUserInfoAudit();

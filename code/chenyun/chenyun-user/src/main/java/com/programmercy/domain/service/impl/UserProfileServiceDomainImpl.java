@@ -1,7 +1,8 @@
 package com.programmercy.domain.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.programmercy.converter.UserConverter;
 import com.programmercy.domain.service.UserProfileServiceDomain;
-import com.programmercy.infra.po.Location;
 import com.programmercy.infra.po.User;
 import com.programmercy.infra.service.LocationService;
 import com.programmercy.infra.service.UserService;
@@ -9,11 +10,15 @@ import com.programmercy.vo.PageInfoVO;
 import com.programmercy.vo.PagedUserVO;
 import com.programmercy.vo.UserVO;
 import jakarta.annotation.Resource;
-import org.springframework.beans.BeanUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Description: 用户信息相关的服务的实现类
@@ -22,31 +27,27 @@ import java.util.List;
  * @author 爱吃小鱼的橙子
  */
 @Service
+@Slf4j
 public class UserProfileServiceDomainImpl implements UserProfileServiceDomain {
 
     @Resource
     private UserService userService;
     @Resource
     private LocationService locationService;
+    @Resource
+    private TransactionTemplate transactionTemplate;
+    @Resource
+    private UserConverter userConverter;
+    @Resource
+    private ExecutorService userThreadPool;
 
     @Override
     public List<PagedUserVO> pageForAListOfUsers(PagedUserVO pagedUserVO) {
         List<User> usersByPageInfo = userService.queryUsersByPageInfo(pagedUserVO.getCurrentPage(), pagedUserVO.getPageSize());
-        List<PagedUserVO> res = new ArrayList<>();
-        for (User user : usersByPageInfo) {
-            // 只记录用户，不记录管理员
-            PagedUserVO userVO = new PagedUserVO();
-            BeanUtils.copyProperties(user, userVO);
-            // 根据用户的 locationId 查询其所在地理位置
-            Location location = locationService.queryById(user.getLocationId());
-            StringBuilder sb = new StringBuilder();
-            sb.append(location.getCountry()).append('/').append(location.getRegion()).append('/').append(location.getCity());
-            userVO.setKey(user.getUserId());
-            userVO.setLocation(sb.toString());
-            userVO.setCurrentPage(pagedUserVO.getCurrentPage()+1);
-            res.add(userVO);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:pageForAListOfUsers:usersByPageInfo: [{}]", JSON.toJSONString(usersByPageInfo));
         }
-        return res;
+        return userConverter.mapPOList2PagedUserVOList(usersByPageInfo, pagedUserVO.getCurrentPage(), null);
     }
 
     @Override
@@ -58,6 +59,9 @@ public class UserProfileServiceDomainImpl implements UserProfileServiceDomain {
     public Boolean userManagementOptionBatch(List<Long> userIds, Integer optionType) {
         Boolean flag = false;
         List<Integer> usersStatus = userService.queryUsersStatus(userIds);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:userManagementOptionBatch:usersStatus: [{}]", JSON.toJSONString(usersStatus));
+        }
         switch (optionType) {
             case 0:
                 // 判断传过来的数据是否可以进行对应的批量操作
@@ -109,7 +113,7 @@ public class UserProfileServiceDomainImpl implements UserProfileServiceDomain {
                 flag = userService.sealedAccount(userId);
                 break;
             case 1:
-                // 进行接触封号处理
+                // 进行解除封号处理
                 flag = userService.unblockTheAccount(userId);
                 break;
             case 2:
@@ -117,7 +121,7 @@ public class UserProfileServiceDomainImpl implements UserProfileServiceDomain {
                 flag = userService.illegalAccount(userId);
                 break;
             case 3:
-                // 进行接触违规处理
+                // 进行解除违规处理
                 flag = userService.cancelTheIllegalAccount(userId);
                 break;
         }
@@ -133,32 +137,19 @@ public class UserProfileServiceDomainImpl implements UserProfileServiceDomain {
     public List<PagedUserVO> getUserInfoAuditList(PageInfoVO pageInfoVO) {
         // 获取待审核用户
         List<User> users = userService.queryUsersAuditByPageInfo(pageInfoVO);
-        List<PagedUserVO> res = new ArrayList<>();
-        for (User user : users) {
-            PagedUserVO userVO = new PagedUserVO();
-            BeanUtils.copyProperties(user, userVO);
-            // 根据用户的 locationId 查询其所在地理位置
-            Location location = locationService.queryById(user.getLocationId());
-            StringBuilder sb = new StringBuilder();
-            sb.append(location.getCountry()).append('/').append(location.getRegion()).append('/').append(location.getCity());
-            userVO.setKey(user.getUserId());
-            userVO.setLocation(sb.toString());
-            res.add(userVO);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:getUserInfoAuditList:users: [{}]", JSON.toJSONString(users));
         }
-        return res;
+        return userConverter.mapPOList2PagedUserVOList(users, pageInfoVO.getCurrentPage(), null);
     }
 
     @Override
     public UserVO getUserInfoById(Long userId) {
         User user = userService.queryById(userId);
-        UserVO userVO = new UserVO();
-        userVO.setKey(user.getUserId().toString());
-        Location location = locationService.queryById(user.getLocationId());
-        StringBuilder sb = new StringBuilder();
-        sb.append(location.getCountry()).append('/').append(location.getRegion()).append('/').append(location.getCity());
-        userVO.setLocation(sb.toString());
-        BeanUtils.copyProperties(user, userVO);
-        return userVO;
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:getUserInfoById:user: [{}]", JSON.toJSONString(user));
+        }
+        return userConverter.mapPO2VO(user);
     }
 
     @Override
@@ -196,86 +187,77 @@ public class UserProfileServiceDomainImpl implements UserProfileServiceDomain {
     }
 
     @Override
-    public List<PagedUserVO> searchUser(String nickname, Integer userStatus, Long currentPage, Long pageSize) {
+    public List<PagedUserVO> searchUser(String nickname, Integer userStatus, Long currentPage, Long pageSize) throws ExecutionException, InterruptedException {
         List<PagedUserVO> res = new ArrayList<>();
         // 1. 两个都有值
         if (nickname != null && nickname != "" && userStatus != null) {
-            List<User> userList = userService.queryUsersByNicknameAndStatus(nickname, userStatus, currentPage, pageSize);
-            // 1.1 总数
-            Long count = userService.countUsersByNicknameAndStatus(nickname, userStatus);
-            if (userList == null || userList.isEmpty()) {
-                return res;
-            } else {
-                for (User user : userList) {
-                    PagedUserVO userVO = new PagedUserVO();
-                    BeanUtils.copyProperties(user, userVO);
-                    userVO.setKey(user.getUserId());
-                    userVO.setCountOfPage(count);
-                    Location location = locationService.queryById(user.getLocationId());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(location.getCountry()).append('/').append(location.getRegion()).append('/').append(location.getCity());
-                    userVO.setLocation(sb.toString());
-                    res.add(userVO);
+            CompletableFuture<List<User>> userListFuture = CompletableFuture.supplyAsync(() -> {
+                return userService.queryUsersByNicknameAndStatus(nickname, userStatus, currentPage, pageSize);
+            }, userThreadPool);
+            CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() -> {
+                return userService.countUsersByNicknameAndStatus(nickname, userStatus);
+            }, userThreadPool);
+            res = userListFuture.thenCombine(countFuture, (userList, count) -> {
+                if (userList != null) {
+                    if (log.isInfoEnabled()) {
+                        log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:searchUser:userList: [{}]", JSON.toJSONString(userList));
+                        log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:searchUser:count: [{}]", JSON.toJSONString(count));
+                    }
+                    return userConverter.mapPOList2PagedUserVOList(userList, currentPage, count);
+                } else {
+                    return null;
                 }
-            }
+            }).get();
         } else if (nickname != null && nickname != "") {
             // 2. 没有用户状态, 根据用户昵称来搜索
-            List<User> userList = userService.queryUsersByNickname(nickname, currentPage, pageSize);
-            Long count = userService.countUsersByNickname(nickname);
-            if (userList == null || userList.isEmpty()) {
-                return res;
-            } else {
-                for (User user : userList) {
-                    PagedUserVO userVO = new PagedUserVO();
-                    BeanUtils.copyProperties(user, userVO);
-                    userVO.setKey(user.getUserId());
-                    userVO.setCountOfPage(count);
-                    Location location = locationService.queryById(user.getLocationId());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(location.getCountry()).append('/').append(location.getRegion()).append('/').append(location.getCity());
-                    userVO.setLocation(sb.toString());
-                    res.add(userVO);
+            CompletableFuture<List<User>> userListFuture = CompletableFuture.supplyAsync(() -> {
+                return userService.queryUsersByNickname(nickname, currentPage, pageSize);
+            }, userThreadPool);
+            CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() -> {
+                return userService.countUsersByNickname(nickname);
+            }, userThreadPool);
+            res = userListFuture.thenCombine(countFuture, (userList, count) -> {
+                if (userList == null || userList.isEmpty()) {
+                    return null;
+                } else {
+                    if (log.isInfoEnabled()) {
+                        log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:searchUser:userList: [{}]", JSON.toJSONString(userList));
+                        log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:searchUser:count: [{}]", JSON.toJSONString(count));
+                    }
+                    return userConverter.mapPOList2PagedUserVOList(userList, currentPage, count);
                 }
-            }
+            }).get();
         } else if (userStatus != null) {
             // 3. 根据用户状态来搜索
-            List<User> userList = userService.queryUsersByStatus(userStatus, currentPage, pageSize);
-            Long count = userService.countUsersByStatus(userStatus);
-            if (userList == null) {
-                return res;
-            } else {
-                for (User user : userList) {
-                    PagedUserVO userVO = new PagedUserVO();
-                    BeanUtils.copyProperties(user, userVO);
-                    userVO.setKey(user.getUserId());
-                    userVO.setCountOfPage(count);
-                    Location location = locationService.queryById(user.getLocationId());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(location.getCountry()).append('/').append(location.getRegion()).append('/').append(location.getCity());
-                    userVO.setLocation(sb.toString());
-                    res.add(userVO);
+            CompletableFuture<List<User>> userListFuture = CompletableFuture.supplyAsync(() -> {
+                return userService.queryUsersByStatus(userStatus, currentPage, pageSize);
+            }, userThreadPool);
+            CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() -> {
+                return userService.countUsersByStatus(userStatus);
+            }, userThreadPool);
+            res = userListFuture.thenCombine(countFuture, (userList, count) -> {
+                if (userList == null) {
+                    return null;
+                } else {
+                    if (log.isInfoEnabled()) {
+                        log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:searchUser:userList: [{}]", JSON.toJSONString(userList));
+                        log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:searchUser:count: [{}]", JSON.toJSONString(count));
+                    }
+                    return userConverter.mapPOList2PagedUserVOList(userList, currentPage, count);
                 }
-            }
+            }).get();
         }
         return res;
     }
 
     @Override
     public List<PagedUserVO> getSearchUserInfoAuditList(String nickname, Long currentPage, Long pageSize) {
-        List<PagedUserVO> res = new ArrayList<>();
         List<User> users = userService.queryAuditUsersByNickname(nickname, currentPage, pageSize);
         Long count = userService.countAuditUsersByNickname(nickname);
-        for (User user : users) {
-            PagedUserVO userVO = new PagedUserVO();
-            BeanUtils.copyProperties(user, userVO);
-            userVO.setKey(user.getUserId());
-            userVO.setCountOfPage(count);
-            Location location = locationService.queryById(user.getLocationId());
-            StringBuilder sb = new StringBuilder();
-            sb.append(location.getCountry()).append('/').append(location.getRegion()).append('/').append(location.getCity());
-            userVO.setLocation(sb.toString());
-            res.add(userVO);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:getSearchUserInfoAuditList:userList: [{}]", JSON.toJSONString(users));
+            log.info("chenyun-user:domain:service:impl:UserProfileServiceDomainImpl:getSearchUserInfoAuditList:count: [{}]", JSON.toJSONString(count));
         }
-        return res;
+        return userConverter.mapPOList2PagedUserVOList(users, currentPage, count);
     }
 }

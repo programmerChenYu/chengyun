@@ -194,5 +194,13 @@ public interface UserDao {
      * @return
      */
     Long countAuditUsersByNickname(@Param("nickname") String nickname);
+
+    /**
+     * 根据用户名和密码查找用户
+     * @param username
+     * @param password
+     * @return
+     */
+    User queryByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
 }
 

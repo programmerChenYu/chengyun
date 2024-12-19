@@ -9,6 +9,10 @@ const HttpUtil = axios.create({
 // 拦截器
 HttpUtil.interceptors.request.use(
     (config) => {
+        const token = localStorage.getItem('cyToken');
+        if (token) {
+            config.headers['cyToken'] = 'Bearer ' + token;
+        }
         return config
     },
     (error) => {
@@ -21,6 +25,7 @@ HttpUtil.interceptors.response.use(
         return response;
     },
     (error) => {
+        console.log(error)
         return Promise.reject(error);
     }
 )

@@ -22,6 +22,11 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
 
     @Override
+    public User queryByUsernameAndPassword(String username, String password) {
+        return userDao.queryByUsernameAndPassword(username, password);
+    }
+
+    @Override
     public Long countAuditUsersByNickname(String nickname) {
         return userDao.countAuditUsersByNickname(nickname);
     }
@@ -80,6 +85,7 @@ public class UserServiceImpl implements UserService {
     public Long numberOfUsersAudit() {
         User user = new User();
         user.setInfoStatus(0);
+        user.setRole(2);
         return userDao.count(user);
     }
 
@@ -151,7 +157,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long numberOfUsers() {
         User user = new User();
-        user.setRole(1);
+        user.setRole(2);
         return userDao.count(user);
     }
 

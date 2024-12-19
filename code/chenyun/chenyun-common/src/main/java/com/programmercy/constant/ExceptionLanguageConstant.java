@@ -18,4 +18,12 @@ public class ExceptionLanguageConstant {
     public static final String SEARCH_TAG_NAME_AND_STATUS_NULL_EXCEPTION = "标签搜索异常，标签名和标签状态不能同时为空";
     public static final String SEARCH_ARTICLE_TITLE_AND_STATUS_NULL_EXCEPTION = "文章搜索异常，文章题目和文章状态不能同时为空";
     public static final String BLOG_ID_NULL_EXCEPTION = "博客 ID 异常，博客 ID 为空";
+
+    public static final String USER_NAME_NULL_EXCEPTION = "用户名不能为空";
+    public static final String PASSWORD_NULL_EXCEPTION = "密码不能为空";
+
+    public static final String TOKEN_NULL_EXCEPTION = "token 异常，token 不能为空";
+
+    public static final String GEO_LESS_THEN_EXCEPTION = "参数异常，查询级别小于 0";
+    public static final String GEO_GREATER_THEN_EXCEPTION = "参数异常，查询级别高于 2";
 }

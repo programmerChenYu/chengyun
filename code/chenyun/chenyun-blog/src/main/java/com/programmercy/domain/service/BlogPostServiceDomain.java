@@ -3,6 +3,7 @@ package com.programmercy.domain.service;
 import com.programmercy.vo.BlogPostVO;
 import com.programmercy.vo.PageInfoVO;
 import com.programmercy.vo.PagingQuerySearchBlogPostVO;
+import io.seata.tm.api.TransactionalExecutor;
 
 import java.util.List;
 
@@ -93,4 +94,5 @@ public interface BlogPostServiceDomain {
      * @return
      */
     Boolean blogInfoProcess(Long blogPostId);
+
 }

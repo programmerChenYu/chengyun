@@ -1,7 +1,6 @@
 import {createBrowserRouter} from "react-router-dom";
 import App from "../App.tsx";
 import Home from "../pages/Home";
-// import NotFound from "../pages/Errors/NotFound.tsx";
 import TagManagement from "../pages/TagManagement";
 import UserManagement from "../pages/UserManagement";
 import BlogManagement from "../pages/BlogManagement";
@@ -11,6 +10,7 @@ import AuditedBlog from "../pages/BlogManagement/AuditedBlog.tsx";
 import ReviewedBlog from "../pages/BlogManagement/ReviewedBlog.tsx";
 import BlogInfo from "../pages/BlogManagement/BlogInfo";
 import ServerError from "../pages/Errors/ServerError.tsx";
+import Login from "../pages/Login";
 
 const router = createBrowserRouter([
     {
@@ -60,6 +60,10 @@ const router = createBrowserRouter([
                 element: <BlogInfo />
             }
         ]
+    },
+    {
+        path:'/login',
+        element: <Login />
     },
     {
         path: '*',

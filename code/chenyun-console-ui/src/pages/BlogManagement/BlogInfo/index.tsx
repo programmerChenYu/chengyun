@@ -177,21 +177,21 @@ const BlogInfo = () => {
                         items.push({
                             key: String(heading.id),
                             href: `#${heading.id}`,
-                            title: String(heading.getHTML()),
+                            title: String(heading.innerHTML),
                             children: []
                         })
                     } else if (heading.tagName === 'H2') {
                         items[items.length-1].children.push({
                             key: String(heading.id),
                             href: `#${heading.id}`,
-                            title: String(heading.getHTML()),
+                            title: String(heading.innerHTML),
                             children: []
                         })
                     } else if (heading.tagName === 'H3') {
                         items[items.length-1].children[items[items.length-1].children.length-1].children.push({
                             key: String(heading.id),
                             href: `#${heading.id}`,
-                            title: String(heading.getHTML()),
+                            title: String(heading.innerHTML),
                             children: []
                         })
                     }

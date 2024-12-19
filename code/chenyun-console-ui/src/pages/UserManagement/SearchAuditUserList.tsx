@@ -37,7 +37,7 @@ const SearchAuditUserList = () => {
     const dispatch = useAppDispatch();
 
     const auditOnClick = (record: UserInterface) => {
-        // TODO 此处做RSA加密处理
+        // 此处做RSA加密处理
         dispatch(setPath(location.pathname+location.search));
         navigate(`/user/audit/info?user=${encodeURIComponent(rsaEncrypt.encrypt(String(record.key)))}`)
     }

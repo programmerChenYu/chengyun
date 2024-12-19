@@ -73,5 +73,9 @@ public class UserVO {
      * 不通过原因
      */
     private List<String> reason;
+    /**
+     * 登录的网站类别 0：管理系统；1：橙云博客网站
+     */
+    private Integer clientType;
 
 }

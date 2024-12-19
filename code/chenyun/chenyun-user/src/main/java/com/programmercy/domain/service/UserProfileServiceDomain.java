@@ -6,6 +6,7 @@ import com.programmercy.vo.PagedUserVO;
 import com.programmercy.vo.UserVO;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Description: 用户信息相关的服务
@@ -96,7 +97,7 @@ public interface UserProfileServiceDomain {
      * @param pageSize
      * @return
      */
-    List<PagedUserVO> searchUser(String nickname, Integer userStatus, Long currentPage, Long pageSize);
+    List<PagedUserVO> searchUser(String nickname, Integer userStatus, Long currentPage, Long pageSize) throws ExecutionException, InterruptedException;
 
     /**
      * 查询用户（审核页面）
@@ -106,4 +107,5 @@ public interface UserProfileServiceDomain {
      * @return
      */
     List<PagedUserVO> getSearchUserInfoAuditList(String nickname, Long currentPage, Long pageSize);
+
 }

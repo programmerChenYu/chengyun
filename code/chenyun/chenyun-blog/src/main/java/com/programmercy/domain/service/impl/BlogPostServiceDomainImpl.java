@@ -1,5 +1,6 @@
 package com.programmercy.domain.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.programmercy.api.feign.user.UserProfileService;
 import com.programmercy.domain.service.BlogPostServiceDomain;
 import com.programmercy.dto.UserDTO;
@@ -9,6 +10,7 @@ import com.programmercy.vo.BlogPostVO;
 import com.programmercy.vo.PageInfoVO;
 import com.programmercy.vo.PagingQuerySearchBlogPostVO;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ import java.util.List;
  * @author 爱吃小鱼的橙子
  */
 @Service
+@Slf4j
 public class BlogPostServiceDomainImpl implements BlogPostServiceDomain {
 
     @Resource
@@ -29,6 +32,7 @@ public class BlogPostServiceDomainImpl implements BlogPostServiceDomain {
 
     @Resource
     private UserProfileService userProfileService;
+
 
     @Override
     public Boolean blogInfoProcess(Long blogPostId) {
@@ -53,6 +57,9 @@ public class BlogPostServiceDomainImpl implements BlogPostServiceDomain {
     @Override
     public BlogPostVO getBlogInfo(Long blogPostId) {
         BlogPost blogPost = blogPostService.queryById(blogPostId);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-blog:domain:service:impl:BlogPostServiceDomainImpl:getBlogInfo:blogPost: [{}]", JSON.toJSONString(blogPost));
+        }
         return mapPO2VO(blogPost);
     }
 
@@ -76,12 +83,21 @@ public class BlogPostServiceDomainImpl implements BlogPostServiceDomain {
         List<BlogPostVO> blogPostVOS = new ArrayList<>();
         if (title != null && title != "" && status != null && status != "") {
             List<BlogPost> blogPostList = blogPostService.pagingQueryArticleListByLimit(title, status, currentPage, pageSize);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:domain:service:impl:BlogPostServiceDomainImpl:pagingQuerySearchArticleList:blogPostList: [{}]", JSON.toJSONString(blogPostList));
+            }
             blogPostVOS = mapPOList2VOList(blogPostList);
         } else if (title != null || title != "") {
             List<BlogPost> blogPostList = blogPostService.pagingQueryArticleListByLimit(title, null, currentPage, pageSize);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:domain:service:impl:BlogPostServiceDomainImpl:pagingQuerySearchArticleList:blogPostList: [{}]", JSON.toJSONString(blogPostList));
+            }
             blogPostVOS = mapPOList2VOList(blogPostList);
         } else if (status != null || status != "") {
             List<BlogPost> blogPostList = blogPostService.pagingQueryArticleListByLimit(null, status, currentPage, pageSize);
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-blog:domain:service:impl:BlogPostServiceDomainImpl:pagingQuerySearchArticleList:blogPostList: [{}]", JSON.toJSONString(blogPostList));
+            }
             blogPostVOS = mapPOList2VOList(blogPostList);
         }
         return blogPostVOS;
@@ -95,6 +111,9 @@ public class BlogPostServiceDomainImpl implements BlogPostServiceDomain {
     @Override
     public List<BlogPostVO> pagingQueryReviewedArticleList(PageInfoVO pageInfoVO) {
         List<BlogPost> blogPostList = blogPostService.pagingQueryReviewedArticleList(pageInfoVO);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-blog:domain:service:impl:BlogPostServiceDomainImpl:pagingQueryReviewedArticleList:blogPostList: [{}]", JSON.toJSONString(blogPostList));
+        }
         List<BlogPostVO> blogPostVOList = mapPOList2VOList(blogPostList);
         return blogPostVOList;
     }
@@ -107,6 +126,9 @@ public class BlogPostServiceDomainImpl implements BlogPostServiceDomain {
     @Override
     public List<BlogPostVO> pagingQueryAuditedArticleList(PageInfoVO pageInfoVO) {
         List<BlogPost> blogPostList = blogPostService.pagingQueryAuditedArticleList(pageInfoVO);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-blog:domain:service:impl:BlogPostServiceDomainImpl:pagingQueryAuditedArticleList:blogPostList: [{}]", JSON.toJSONString(blogPostList));
+        }
         List<BlogPostVO> blogPostVOList = mapPOList2VOList(blogPostList);
         return blogPostVOList;
     }
@@ -119,6 +141,9 @@ public class BlogPostServiceDomainImpl implements BlogPostServiceDomain {
     @Override
     public List<BlogPostVO> pagingQueryArticleList(PageInfoVO pageInfoVO) {
         List<BlogPost> blogPostList = blogPostService.pagingQueryArticleList(pageInfoVO);
+        if (log.isInfoEnabled()) {
+            log.info("chenyun-blog:domain:service:impl:BlogPostServiceDomainImpl:pagingQueryArticleList:blogPostList: [{}]", JSON.toJSONString(blogPostList));
+        }
         List<BlogPostVO> blogPostVOList = mapPOList2VOList(blogPostList);
         return blogPostVOList;
     }

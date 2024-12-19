@@ -1,5 +1,6 @@
 package com.programmercy.api;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
 import com.programmercy.constant.ExceptionLanguageConstant;
 import com.programmercy.domain.service.UserProfileServiceDomain;
@@ -9,10 +10,7 @@ import com.programmercy.vo.UserVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Description: 提供远程调用服务的用户个人资料控制类
@@ -35,13 +33,16 @@ public class UserProfileFeignController {
     public UserDTO getUserInfoByIdAPI(@RequestBody UserDTO userDTO) {
         try {
             Preconditions.checkNotNull(userDTO.getKey(), ExceptionLanguageConstant.USER_ID_NULL_EXCEPTION);
-            log.info("chenyun-user:api:UserProfileController:getUserInfoByIdAPI:userDTO:id, {}", userDTO.getKey());
+            if (log.isInfoEnabled()) {
+                log.info("chenyun-user:api:UserProfileController:getUserInfoByIdAPI:userDTO: [{}]", JSON.toJSONString(userDTO));
+            }
             UserVO userVO = userProfileServiceDomain.getUserInfoById(Long.valueOf(userDTO.getKey()));
             BeanUtils.copyProperties(userVO, userDTO);
             return userDTO;
         } catch (Exception e) {
-            log.error("chenyun-user:api:UserProfileController:getUserInfoByIdAPI:Exception, {}", e.getMessage());
+            log.error("chenyun-user:api:UserProfileController:getUserInfoByIdAPI:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return null;
         }
     }
+
 }

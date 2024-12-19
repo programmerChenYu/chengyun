@@ -19,6 +19,7 @@ spring:
   config:
     import:
       - classpath:datasource.yml
+      - classpath:saToken.yml
   servlet:
     multipart:
       # 单个文件大小
@@ -44,6 +45,7 @@ spring:
         server-addr: 192.168.116.131:8848
         username: nacos
         password: nacos
+        group: SEATA_GROUP
     inetutils:
       timeout-seconds: 5
   cache:
@@ -55,3 +57,17 @@ logging:
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   type-aliases-package: com.programmerCy.infra.mapper
+seata:
+  tx-service-group: chenyun_tx_group
+  service:
+    vgroup-mapping:
+      chenyun_tx_group: default
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 192.168.116.131:8848
+      application: seata-server
+      group: SEATA_GROUP
+      username: nacos
+      password: nacos
+  application-id: ${spring.application.name}-seata

@@ -80,7 +80,10 @@ const TagManagement = () => {
             } else {
                 setIsVisible(false);
             }
-            setSelectedRowKeys(newSelectedRowKeys)
+            const keys:React.Key[] = [];
+            keys.push(...selectedRowKeys);
+            keys.push(...newSelectedRowKeys);
+            setSelectedRowKeys(keys);
         }
     }
 

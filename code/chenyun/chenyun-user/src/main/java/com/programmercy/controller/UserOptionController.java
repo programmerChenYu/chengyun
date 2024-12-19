@@ -20,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/option")
 @Slf4j
+@SuppressWarnings("unchecked")
 public class UserOptionController {
 
     @Resource
@@ -33,7 +34,7 @@ public class UserOptionController {
         try {
             return Result.ok(userSearchLogsServiceDomain.getHotSearch());
         } catch (Exception e) {
-            log.error("chenyun-user:UserOptionController:getHotSearch:Exception:【{}】", e.getStackTrace());
+            log.error("chenyun-user:controller:UserOptionController:getHotSearch:Exception: [{},{}]", e.getMessage(), e.getStackTrace());
             return Result.fail(null);
         }
     }
